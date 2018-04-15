@@ -13,11 +13,13 @@ namespace PlayWithTelegram
         private readonly Resolver _resolver;
         private int _offset { get; set; }
         private readonly Queue<Update> _queue;
+        private readonly TelegramWaitMessage _waitMessage;
 
-        public MiniWorker(TelegramBotClient botClient, Resolver resolver)
+        public MiniWorker(TelegramBotClient botClient, Resolver resolver, TelegramWaitMessage waitMessage)
         {
             _botClient = botClient;
             _resolver = resolver;
+            _waitMessage = waitMessage;
             _queue = new Queue<Update>();
             _offset = 0;
         }
@@ -37,6 +39,12 @@ namespace PlayWithTelegram
                 for (int i = 0; i < _queue.Count; i++)
                 {
                     var update = _queue.Dequeue();
+                    if (_waitMessage.IsWaitGameName)
+                    {
+                        _waitMessage.Action(_botClient, update.Message);
+                        continue;
+                    }
+
                     if (update.Type == UpdateType.MessageUpdate)
                     {
                         if (update.Message.Type == MessageType.TextMessage)
