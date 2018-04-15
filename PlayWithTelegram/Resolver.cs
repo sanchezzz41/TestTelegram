@@ -25,9 +25,9 @@ namespace PlayWithTelegram
                 if (message.Text == null || !message.Text.StartsWith("/"))
                     return null;
 
-                var command = message.Text?.Split("@").FirstOrDefault()?.ToLower();
+                var command = message.Text?.Split(new char[]{'@',' '}).FirstOrDefault()?.ToLower();
                 var result = _provider.GetServices<ICommand>()
-                    .SingleOrDefault(x => x.CommandText?.ToLower() == command);
+                    .SingleOrDefault(x => x.CommandText.ToLower().Contains(command));
                 if (result == null)
                     return _provider.GetServices<ICommand>()
                         .SingleOrDefault(x => x.CommandText.ToLower() == "defaultcommand");
